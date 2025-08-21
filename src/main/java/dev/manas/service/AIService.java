@@ -62,8 +62,9 @@ public class AIService {
         Map<String, Object> body = new HashMap<>();
         body.put("contents", Collections.singletonList(content));
 
-        String finalUrl = geminiUrl + "?key=" + geminiKey;
-
+        //String finalUrl = geminiUrl + "?key=" + geminiKey;
+        String finalUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + geminiKey;
+        //String finalUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + geminiKey;
         return webClient.post()
                 .uri(finalUrl)
                 .contentType(MediaType.APPLICATION_JSON)

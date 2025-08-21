@@ -21,26 +21,22 @@
     </properties>
 
     <dependencies>
-        <!-- Core dependency for web applications -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- For making reactive API calls -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
-        <!-- Provides the JSP engine for the embedded Tomcat server -->
+        <!-- Provides the JSP engine. The <scope> has been removed to ensure it's included at runtime. -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <scope>provided</scope>
         </dependency>
 
-        <!-- Dependencies for using JSTL tags in the JSP -->
         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
@@ -50,7 +46,6 @@
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
         </dependency>
 
-        <!-- Standard dependency for testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
