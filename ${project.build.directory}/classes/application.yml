@@ -1,0 +1,21 @@
+# Server and JSP configuration
+server:
+  port: 8081
+
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+
+# API Configuration for AI Services
+# IMPORTANT: Replace placeholders with your actual API keys.
+api:
+  openai:
+    url: https://api.openai.com/v1/chat/completions
+    key: "${OPENAI_API_KEY}" # Reads from an environment variable
+  gemini:
+    url: https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent
+    key: "${GEMINI_API_KEY}"   # Reads from an environment variable
+
+
