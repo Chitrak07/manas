@@ -13,8 +13,9 @@ spring:
 api:
   openai:
     url: https://api.openai.com/v1/chat/completions
-    key: "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" # Replace this
+    key: "${OPENAI_API_KEY}" # Reads from an environment variable
   gemini:
     url: https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent
-    key: "AIzaSyAOkV_XRayXsPYOv1X4Lxp2CCjjrD1ajcw" # Replace this
+    key: "${GEMINI_API_KEY}"   # Reads from an environment variable
+
 
