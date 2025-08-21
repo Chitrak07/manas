@@ -8,10 +8,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.HashMap; // Import HashMap
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Collections; // Import Collections
 
 @Service
 public class AIService {
@@ -33,13 +33,13 @@ public class AIService {
     }
 
     public Mono<String> callOpenAI(String query) {
-        // Replaced Map.of() with a Java 8 compatible method
+        Map<String, Object> message = new HashMap<>();
+        message.put("role", "user");
+        message.put("content", query);
+
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-4o-mini");
-        body.put("messages", Collections.singletonList(Collections.singletonMap("role", "user")));
-        // A more robust way to add the content to the nested map
-        ((List<Map<String, String>>) body.get("messages")).get(0).put("content", query);
-
+        body.put("messages", Collections.singletonList(message));
 
         return webClient.post()
                 .uri(openAIUrl)
@@ -53,12 +53,13 @@ public class AIService {
     }
 
     public Mono<String> callGemini(String query) {
-        // Replaced Map.of() with a Java 8 compatible method
-        Map<String, Object> body = new HashMap<>();
         Map<String, Object> part = new HashMap<>();
         part.put("text", query);
+
         Map<String, Object> content = new HashMap<>();
         content.put("parts", Collections.singletonList(part));
+
+        Map<String, Object> body = new HashMap<>();
         body.put("contents", Collections.singletonList(content));
 
         String finalUrl = geminiUrl + "?key=" + geminiKey;
