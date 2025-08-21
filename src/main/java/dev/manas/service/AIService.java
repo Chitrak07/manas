@@ -8,10 +8,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class AIService {
@@ -23,8 +23,6 @@ public class AIService {
     @Value("${api.openai.key}")
     private String openAIKey;
 
-    @Value("${api.gemini.url}")
-    private String geminiUrl;
     @Value("${api.gemini.key}")
     private String geminiKey;
 
@@ -32,14 +30,11 @@ public class AIService {
         this.webClient = webClientBuilder.build();
     }
 
-    public Mono<String> callOpenAI(String query) {
-        Map<String, Object> message = new HashMap<>();
-        message.put("role", "user");
-        message.put("content", query);
-
+    // Updated to accept a list of messages for conversation history
+    public Mono<String> callOpenAI(List<Map<String, String>> messages) {
         Map<String, Object> body = new HashMap<>();
         body.put("model", "gpt-4o-mini");
-        body.put("messages", Collections.singletonList(message));
+        body.put("messages", messages); // Send the whole conversation
 
         return webClient.post()
                 .uri(openAIUrl)
@@ -48,30 +43,37 @@ public class AIService {
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String.class)
-                .onErrorResume(e -> Mono.just("Error calling OpenAI: " + e.getMessage()))
+                .onErrorResume(e -> Mono.just("{\"error\": \"Error calling OpenAI: " + e.getMessage() + "\"}"))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
-    public Mono<String> callGemini(String query) {
-        Map<String, Object> part = new HashMap<>();
-        part.put("text", query);
-
-        Map<String, Object> content = new HashMap<>();
-        content.put("parts", Collections.singletonList(part));
+    // Updated to accept a list of messages for conversation history
+    public Mono<String> callGemini(List<Map<String, String>> messages) {
+        // Gemini API requires a specific format for contents
+        List<Map<String, Object>> contents = messages.stream()
+                .map(message -> {
+                    Map<String, Object> part = new HashMap<>();
+                    part.put("text", message.get("content"));
+                    Map<String, Object> content = new HashMap<>();
+                    content.put("parts", List.of(part));
+                    // Gemini uses 'user' and 'model' for roles
+                    content.put("role", message.get("role").equals("assistant") ? "model" : message.get("role"));
+                    return content;
+                })
+                .collect(Collectors.toList());
 
         Map<String, Object> body = new HashMap<>();
-        body.put("contents", Collections.singletonList(content));
+        body.put("contents", contents);
 
-        //String finalUrl = geminiUrl + "?key=" + geminiKey;
         String finalUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=" + geminiKey;
-        //String finalUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + geminiKey;
+
         return webClient.post()
                 .uri(finalUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(String.class)
-                .onErrorResume(e -> Mono.just("Error calling Gemini: " + e.getMessage()))
+                .onErrorResume(e -> Mono.just("{\"error\": \"Error calling Gemini: " + e.getMessage() + "\"}"))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 }
