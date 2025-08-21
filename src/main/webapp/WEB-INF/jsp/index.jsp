@@ -4,28 +4,93 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale-1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manas AI Gateway</title>
     <style>
+        /* Modern Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+
+        /* CSS Variables for Theming */
+        :root {
+            --bg-color: #f8f9fa;
+            --text-color: #212529;
+            --card-bg: #ffffff;
+            --border-color: #dee2e6;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --font-main: 'Inter', sans-serif;
+            --font-reading: 'Lora', serif;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --card-bg: #1e1e1e;
+            --border-color: #444;
+            --primary-color: #3793ff;
+            --primary-hover: #5fa4ff;
+        }
+
+        body.reading-mode {
+            --bg-color: #fdf1d3; /* More yellowish vintage paper */
+            --text-color: #4d3d2b; /* Darker brown ink color */
+            --card-bg: #fbf5e2;
+            --border-color: #e9e0cf;
+            --font-main: 'Lora', serif;
+            line-height: 1.7;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: var(--font-main);
             margin: 0;
             padding: 2rem;
-            background-color: #f8f9fa;
-            color: #212529;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background-color: #ffffff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
         }
         h1 {
-            text-align: center;
-            color: #343a40;
-            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            margin: 0;
+        }
+        .theme-switcher {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .theme-switcher button {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            background-color: transparent;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .theme-switcher button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .main-content {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        body.dark-mode .main-content {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
         form {
             display: flex;
@@ -34,25 +99,29 @@
         }
         textarea {
             width: 100%;
-            padding: 0.75rem;
+            padding: 0.75rem 1rem;
             font-size: 1rem;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+            font-family: var(--font-main);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             box-sizing: border-box;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            resize: vertical;
         }
-        button {
-            padding: 0.75rem;
+        button[type="submit"] {
+            padding: 0.8rem;
             font-size: 1.1rem;
             font-weight: bold;
             color: #fff;
-            background-color: #007bff;
+            background-color: var(--primary-color);
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.2s;
         }
-        button:hover {
-            background-color: #0056b3;
+        button[type="submit"]:hover {
+            background-color: var(--primary-hover);
         }
         .results-grid {
             margin-top: 2rem;
@@ -61,64 +130,123 @@
             gap: 1.5rem;
         }
         .result-card {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             padding: 1.5rem;
+            background-color: var(--bg-color);
         }
         .result-card h2 {
             margin-top: 0;
-            color: #495057;
-            border-bottom: 2px solid #007bff;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 0.5rem;
         }
-        pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            background-color: #e9ecef;
-            padding: 1rem;
-            border-radius: 4px;
-            font-family: "SF Mono", "Fira Code", monospace;
-            font-size: 0.9rem;
+        .response-content {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .model-info {
+            text-align: right;
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 1rem;
+            font-style: italic;
         }
         .query-display {
             margin-top: 2rem;
             padding: 1rem;
-            background-color: #e9ecef;
-            border-left: 5px solid #007bff;
+            background-color: var(--bg-color);
+            border-left: 5px solid var(--primary-color);
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Manas AI Gateway</h1>
-    <form action="/ask" method="post">
-        <textarea name="query" rows="4" placeholder="Enter your query here..." required></textarea>
-        <button type="submit">Ask All AIs</button>
-    </form>
-
-    <c:if test="${not empty query}">
-        <div class="query-display">
-            <strong>Your Query:</strong>
-            <p>${query}</p>
+    <header class="header">
+        <h1>Manas AI Gateway</h1>
+        <div class="theme-switcher">
+            <button id="light-btn">Light</button>
+            <button id="dark-btn">Dark</button>
+            <button id="read-btn">Reading</button>
         </div>
-    </c:if>
+    </header>
 
-    <div class="results-grid">
-        <c:if test="${not empty openAIResponse}">
-            <div class="result-card">
-                <h2>OpenAI GPT Response</h2>
-                <pre>${openAIResponse}</pre>
+    <div class="main-content">
+        <form action="/ask" method="post">
+            <textarea name="query" rows="4" placeholder="Enter your query here..." required></textarea>
+            <button type="submit">Ask All AIs</button>
+        </form>
+
+        <c:if test="${not empty query}">
+            <div class="query-display">
+                <strong>Your Query:</strong>
+                <p>${query}</p>
             </div>
         </c:if>
 
-        <c:if test="${not empty geminiResponse}">
-            <div class="result-card">
-                <h2>Google Gemini Response</h2>
-                <pre>${geminiResponse}</pre>
-            </div>
-        </c:if>
+        <div class="results-grid">
+            <c:if test="${not empty openAIResponse}">
+                <div class="result-card">
+                    <h2>OpenAI GPT Response</h2>
+                    <div class="response-content">${openAIResponse}</div>
+                    <p class="model-info">Model: ${openAIModel}</p>
+                </div>
+            </c:if>
+
+            <c:if test="${not empty geminiResponse}">
+                <div class="result-card">
+                    <h2>Google Gemini Response</h2>
+                    <div class="response-content">${geminiResponse}</div>
+                    <p class="model-info">Model: ${geminiModel}</p>
+                </div>
+            </c:if>
+        </div>
     </div>
 </div>
+
+<script>
+    const lightBtn = document.getElementById('light-btn');
+    const darkBtn = document.getElementById('dark-btn');
+    const readBtn = document.getElementById('read-btn');
+    const body = document.body;
+
+    const themeButtons = [lightBtn, darkBtn, readBtn];
+
+    function setActiveButton(activeBtn) {
+        themeButtons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+    }
+
+    function setTheme(theme) {
+        body.classList.remove('dark-mode', 'reading-mode');
+        localStorage.setItem('theme', theme);
+
+        if (theme === 'dark') {
+            body.classList.add('dark-mode');
+            setActiveButton(darkBtn);
+        } else if (theme === 'reading') {
+            body.classList.add('reading-mode');
+            setActiveButton(readBtn);
+        } else {
+            // Default to light theme
+            setActiveButton(lightBtn);
+        }
+    }
+
+    lightBtn.addEventListener('click', () => setTheme('light'));
+    darkBtn.addEventListener('click', () => setTheme('dark'));
+    readBtn.addEventListener('click', () => setTheme('reading'));
+
+    // On page load, apply the saved theme from localStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+    });
+</script>
+
 </body>
 </html>
