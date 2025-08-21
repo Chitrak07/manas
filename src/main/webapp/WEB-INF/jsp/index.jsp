@@ -66,16 +66,34 @@
             border-radius: 5px; background-color: var(--card-bg); color: var(--text-color); cursor: pointer;
             text-decoration: none;
         }
+        #history-list { list-style: none; padding: 0; margin-top: 1rem; }
+        #history-list a {
+            display: block; padding: 0.75rem; margin-bottom: 0.5rem; background: var(--card-bg);
+            border-radius: 5px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            text-decoration: none; color: var(--text-color); border: 1px solid transparent;
+        }
+        #history-list a.active {
+            border-color: var(--primary-color);
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="history-column">
         <div class="history-header">
-            <h3>Chat</h3>
+            <h3>History</h3>
             <a href="/new-chat" class="new-chat-btn">+ New Chat</a>
         </div>
-        <%-- You can add a list of past chat sessions here later --%>
+        <ul id="history-list">
+            <c:forEach var="chatEntry" items="${allChats}">
+                <c:if test="${not empty chatEntry.value}">
+                    <a href="/chat/${chatEntry.key}" class="${chatEntry.key == activeChatId ? 'active' : ''}">
+                        ${chatEntry.value[0].content}
+                    </a>
+                </c:if>
+            </c:forEach>
+        </ul>
     </div>
     <div class="main-column">
         <header class="header">
@@ -91,7 +109,7 @@
                 <c:if test="${empty chatHistory}">
                     <div class="chat-message">
                         <div class="content" style="text-align: center; background: none;">
-                            Start a conversation by typing in the box below.
+                            Start a new conversation or select one from the history.
                         </div>
                     </div>
                 </c:if>
@@ -124,12 +142,8 @@
 
 <script>
     const chatLog = document.getElementById('chat-log');
-
-    // --- AUTO-SCROLL TO BOTTOM ---
-    // This line ensures the chat view is always scrolled to the latest message on page load.
     chatLog.scrollTop = chatLog.scrollHeight;
 
-    // --- THEME SWITCHER ---
     const lightBtn = document.getElementById('light-btn');
     const darkBtn = document.getElementById('dark-btn');
     const readBtn = document.getElementById('read-btn');
